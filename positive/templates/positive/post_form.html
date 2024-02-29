@@ -10,5 +10,20 @@
         {{ form.as_p }}
         <button type="submit">Submit</button>
     </form>
+
+    <h2>Previous Posts</h2>
+    <ul>
+        {% for post in posts %}
+            <li>
+                {{ post.text }}
+                <!-- 削除フォーム -->
+                <form action="{% url 'post_delete' post.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    
 </body>
 </html>
