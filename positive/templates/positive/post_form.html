@@ -2,6 +2,45 @@
 <html>
 <head>
     <title>Post Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // jQueryの準備ができた時に実行される関数
+        $(document).ready(function(){
+            // 'form' 要素に 'submit' イベントリスナーを設定
+            $('form').on('submit', function(event){
+                // フォームのデフォルトの送信動作を防ぐ
+                event.preventDefault();
+                // テキスト入力フィールドの値を取得
+                var text = $('#id_text').val();
+                // Ajaxリクエストを送信
+                $.ajax({
+                    // リクエストのURLを指定
+                    url: '/check-positive/',
+                    // リクエストタイプをPOSTに設定
+                    type: 'POST',
+                    // サーバーに送信するデータを指定
+                    data: {
+                        'text': text, // 入力されたテキスト
+                        'csrfmiddlewaretoken': '{{ csrf_token }}' // CSRFトークン
+                    },
+                    // データタイプをJSONに設定
+                    dataType: 'json',
+                    // リクエストが成功した時に実行される関数
+                    success: function(response){
+                        // レスポンスがポジティブでない場合
+                        if (!response.is_positive) {
+                            // 警告メッセージを表示
+                            alert('ポジティブなメッセージにしてください。');
+                        } else {
+                            // フォームを送信する
+                            event.target.submit();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    
 </head>
 <body>
     <h1>Post a Positive Message</h1>

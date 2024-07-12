@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.urls import reverse
 from .forms import PostForm
 from .models import Post
@@ -16,16 +17,10 @@ def post_create(request):
                 Post.objects.create(text=text)  # テキストをデータベースに保存
                 # 成功した場合、すべての投稿を含むページを再度表示
                 return render(request, 'positive/post_form.html', {'form': PostForm(), 'posts': posts})
-            else:
-                # テキストがポジティブでない場合
-                return render(request, 'positive/failure.html')
     else:
         form = PostForm()
     # GETリクエストの場合、またはフォームが表示された直後
     return render(request, 'positive/post_form.html', {'form': form, 'posts': posts})
-
-# def success(request):
-#     return render(request, 'positive/success.html')
 
 def failure(request):
     return render(request, 'positive/failure.html')
@@ -37,3 +32,11 @@ def post_delete(request, post_id):
         return HttpResponseRedirect(reverse('home'))  # 削除後はホームページにリダイレクト
     else:
         return HttpResponseRedirect(reverse('home'))  # GETリクエストの場合もホームにリダイレクト
+
+def check_positive(request):
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        is_pos = is_positive(text)
+        return JsonResponse({'is_positive': is_pos})
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
